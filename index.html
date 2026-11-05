@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="履修10X">
+<title>履修10X｜履修登録を10倍楽に</title>
+<style>
+:root{
+  --bg:#fff;--card:#f2f2f7;--card2:#e9e9ef;--text:#1c1c1e;--sub:#8e8e93;--line:rgba(60,60,67,.14);
+  --accent:#fa243c;--accent2:#ff6a7a;--ok:#30b955;--warn:#ff9f0a;--blur:rgba(255,255,255,.78);
+  --easy:#34c759;--grow:#0a84ff;--fun:#ff375f;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#000;--card:#1c1c1e;--card2:#2c2c2e;--text:#fff;--sub:#98989f;--line:rgba(235,235,245,.16);--blur:rgba(28,28,30,.78);
+}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#d8d8de;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Hiragino Sans","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;color:var(--text)}
+@media(prefers-color-scheme:dark){html,body{background:#111}}
+#app{position:relative;width:min(480px,100vw);height:100dvh;margin:0 auto;background:var(--bg);overflow:hidden;box-shadow:0 0 40px rgba(0,0,0,.18)}
+#view{height:100%;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 18px) 18px 190px;scrollbar-width:none}
+#view::-webkit-scrollbar{display:none}
+h1{font-size:34px;font-weight:800;letter-spacing:-.5px;margin:6px 0 4px}
+h2{font-size:21px;font-weight:700;margin:26px 0 10px;display:flex;align-items:center;justify-content:space-between}
+h2 small{font-size:13px;color:var(--accent);font-weight:500}
+p{margin:0}
+.sub{color:var(--sub);font-size:13px}
+svg{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+/* tab bar */
+#tabs{position:absolute;left:0;right:0;bottom:0;display:flex;padding:8px 6px calc(env(safe-area-inset-bottom) + 6px);background:var(--blur);backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);border-top:1px solid var(--line);z-index:20}
+#tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;color:var(--sub);font-weight:500}
+#tabs button svg{font-size:25px}
+#tabs button.on{color:var(--accent)}
+/* mini player */
+#mini{position:absolute;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom) + 66px);height:58px;border-radius:16px;background:var(--blur);backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);box-shadow:0 4px 18px rgba(0,0,0,.14);display:flex;align-items:center;gap:12px;padding:0 14px 0 8px;z-index:19;overflow:hidden}
+#mini .art{width:42px;height:42px;border-radius:9px;display:grid;place-items:center;font-size:22px;color:#fff;background:linear-gradient(135deg,var(--accent),#ff8a5c)}
+#mini .t{flex:1;min-width:0}
+#mini .t b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mini .t span{font-size:12px;color:var(--sub)}
+#mini .bar{position:absolute;left:0;bottom:0;height:3px;background:var(--accent);transition:width .4s}
+#mini button{font-size:24px;color:var(--text)}
+/* cards */
+.card{background:var(--card);border-radius:18px;padding:16px}
+.hero{border-radius:24px;padding:22px;color:#fff;background:linear-gradient(135deg,#fa243c 0%,#ff5e62 45%,#ff9966 100%);position:relative;overflow:hidden;box-shadow:0 12px 28px rgba(250,36,60,.28)}
+.hero:after{content:"";position:absolute;right:-40px;top:-40px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.16)}
+.hero .k{font-size:12px;font-weight:700;letter-spacing:.08em;opacity:.9}
+.hero .big{font-size:26px;font-weight:800;margin:6px 0 4px;line-height:1.25}
+.hero .stats{display:flex;gap:18px;margin:14px 0 16px}
+.hero .stats div{font-size:11px;opacity:.9}.hero .stats b{display:block;font-size:22px}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:10px 18px;font-weight:700;font-size:14px;background:var(--accent);color:#fff}
+.btn svg{font-size:16px}
+.btn.w{background:#fff;color:var(--accent)}
+.btn.g{background:var(--card2);color:var(--text)}
+.btn.sm{padding:7px 13px;font-size:12.5px}
+.btn.on{background:var(--accent);color:#fff}
+/* rows */
+.row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.cover{width:56px;height:56px;border-radius:12px;display:grid;place-items:center;font-size:28px;flex:none;box-shadow:0 3px 10px rgba(0,0,0,.14);color:#fff}
+.row .m{flex:1;min-width:0}
+.row .m b{display:block;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .m span{font-size:12px;color:var(--sub)}
+.pills{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap}
+.pill{font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--card2);white-space:nowrap}
+.pill.e{color:var(--easy)}.pill.g{color:var(--grow)}.pill.f{color:var(--fun)}
+.row .m .pill.e{color:var(--easy)}.row .m .pill.g{color:var(--grow)}.row .m .pill.f{color:var(--fun)}.row .m .pill.risk{color:var(--warn)}.row .m .pill.cross{color:#af52de}
+.pill.risk{background:rgba(255,159,10,.16);color:var(--warn)}.pill.cross{background:rgba(175,82,222,.14);color:#af52de}
+.circ{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:18px;background:var(--card2);color:var(--accent);flex:none}
+.circ.on{background:var(--accent);color:#fff}
+/* scroll shelf */
+.shelf{display:flex;gap:14px;overflow-x:auto;margin:0 -18px;padding:0 18px 4px;scrollbar-width:none}
+.shelf::-webkit-scrollbar{display:none}
+.tile{width:140px;flex:none}
+.tile .cover{width:140px;height:140px;border-radius:16px;font-size:56px;position:relative}
+.tile b{display:block;margin-top:8px;font-size:14px;line-height:1.3}
+.tile span{font-size:12px;color:var(--sub)}
+.badge{position:absolute;left:8px;bottom:8px;font-size:11px;font-weight:800;padding:3px 8px;border-radius:99px;background:rgba(0,0,0,.38);backdrop-filter:blur(6px);color:#fff}
+/* chips / seg */
+.chips{display:flex;gap:8px;overflow-x:auto;margin:10px -18px 4px;padding:0 18px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:7px 14px;border-radius:99px;background:var(--card);font-size:13.5px;font-weight:600;display:inline-flex;gap:5px;align-items:center}
+.chip.on{background:var(--accent);color:#fff}
+.seg{display:flex;background:var(--card);border-radius:11px;padding:3px;margin:10px 0}
+.seg button{flex:1;padding:7px 0;border-radius:9px;font-size:13.5px;font-weight:600;color:var(--sub);display:flex;justify-content:center;gap:5px;align-items:center}
+.seg button.on{background:var(--bg);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.14)}
+.search{display:flex;align-items:center;gap:8px;background:var(--card);border-radius:12px;padding:10px 12px;margin-top:8px}
+.search input{flex:1;border:0;background:none;outline:none;font:inherit;font-size:16px;color:var(--text)}
+.search svg{color:var(--sub);font-size:18px}
+/* timetable */
+.grid{display:grid;grid-template-columns:26px repeat(5,1fr);gap:5px;margin-top:6px}
+.grid .h{text-align:center;font-size:12px;font-weight:700;color:var(--sub);padding:4px 0}
+.grid .p{display:grid;place-items:center;font-size:11px;color:var(--sub);font-weight:700}
+.cell{aspect-ratio:.72;border-radius:11px;background:var(--card);display:grid;place-items:center;color:var(--sub);font-size:20px;position:relative;overflow:hidden}
+.cell.f{color:#fff;padding:4px;text-align:center;align-content:center;box-shadow:0 3px 8px rgba(0,0,0,.14)}
+.cell.f i{font-style:normal;font-size:20px;line-height:1}
+.cell.f small{font-size:9.5px;font-weight:700;line-height:1.15;margin-top:3px;display:block;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.cell.hl{outline:2px dashed var(--accent)}
+.tools{display:flex;gap:8px;margin:14px 0;flex-wrap:wrap}
+.pl{display:flex;gap:8px;margin-top:8px}
+.pl button{flex:1;padding:10px;border-radius:13px;background:var(--card);font-weight:800;font-size:15px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.pl button small{font-weight:500;font-size:10.5px;color:var(--sub)}
+.pl button.on{background:var(--accent);color:#fff}.pl button.on small{color:rgba(255,255,255,.85)}
+/* bars */
+.bar{height:9px;border-radius:9px;background:var(--card2);overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.wk{display:flex;align-items:flex-end;gap:5px;height:130px;margin-top:10px}
+.wk div{flex:1;border-radius:6px 6px 3px 3px;background:linear-gradient(var(--accent2),var(--accent));min-height:4px;position:relative}
+.wk div.ok{background:linear-gradient(#7be495,var(--easy))}
+.wk span{position:absolute;bottom:-18px;left:0;right:0;text-align:center;font-size:9.5px;color:var(--sub)}
+.legend{display:flex;gap:12px;font-size:11.5px;color:var(--sub);margin-top:26px}
+/* sheet */
+#ov{position:absolute;inset:0;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:.25s;z-index:40}
+#ov.on{opacity:1;pointer-events:auto}
+#sheet{position:absolute;left:0;right:0;bottom:0;max-height:92%;background:var(--bg);border-radius:26px 26px 0 0;transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.8,.2,1);z-index:41;overflow-y:auto;padding:10px 18px calc(env(safe-area-inset-bottom) + 26px);scrollbar-width:none}
+#sheet.on{transform:none}
+#sheet .grab{width:38px;height:5px;border-radius:5px;background:var(--line);margin:0 auto 12px}
+.dh{display:flex;gap:14px;align-items:center}
+.dh .cover{width:84px;height:84px;font-size:42px;border-radius:18px}
+.dh h3{font-size:22px;margin:0 0 4px;line-height:1.2}
+.rings{display:flex;justify-content:space-around;margin:18px 0 6px}
+.ringw{text-align:center;font-size:12px;font-weight:700;color:var(--sub)}
+.ringw svg{width:74px;height:74px;display:block;margin:0 auto 4px}
+.kv{display:flex;justify-content:space-between;font-size:14px;padding:8px 0;border-bottom:1px solid var(--line)}
+.kv:last-child{border:0}
+.ai{background:linear-gradient(135deg,rgba(250,36,60,.10),rgba(255,153,102,.14));border-radius:16px;padding:14px;font-size:14px;line-height:1.55;margin-top:14px}
+.ai b{display:flex;gap:6px;align-items:center;color:var(--accent);margin-bottom:5px;font-size:13px}
+.rv{padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.5}
+.rv .st{color:#ffb300;font-size:12px;letter-spacing:1px}
+.rv.lock{filter:blur(5px);user-select:none}
+.act{display:flex;gap:8px;margin-top:16px}
+.act .btn{flex:1;justify-content:center;padding:13px}
+label.f{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}
+.in,select.in{width:100%;border:0;border-radius:11px;background:var(--card);padding:11px 12px;font:inherit;font-size:16px;color:var(--text);outline:none}
+.opts{display:flex;gap:7px;flex-wrap:wrap}
+.opts .chip{font-size:13px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.step{display:flex;align-items:center;gap:10px}
+.step button{width:28px;height:28px;border-radius:50%;background:var(--card2);display:grid;place-items:center;font-size:15px}
+/* chat */
+.msgs{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.b{max-width:86%;padding:10px 14px;border-radius:19px;font-size:15px;line-height:1.5;white-space:pre-wrap}
+.b.me{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:5px}
+.b.ai{align-self:flex-start;background:var(--card);border-bottom-left-radius:5px}
+.pc{align-self:stretch;background:var(--card);border-radius:18px;padding:14px}
+.pc .mg{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin:10px 0}
+.pc .mg i{aspect-ratio:1.2;border-radius:4px;background:var(--card2)}
+.composer{position:sticky;bottom:128px;display:flex;gap:8px;margin-top:14px;padding:8px 0;background:var(--bg);z-index:5}
+.composer input{flex:1}
+.send{width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:19px}
+/* toast */
+#toast{position:absolute;left:50%;top:calc(env(safe-area-inset-top) + 12px);transform:translate(-50%,-90px);background:rgba(30,30,32,.94);color:#fff;border-radius:16px;padding:11px 16px;font-size:14px;font-weight:600;z-index:60;display:flex;gap:12px;align-items:center;transition:.35s cubic-bezier(.2,.9,.3,1.2);max-width:92%}
+#toast.on{transform:translate(-50%,0)}
+#toast button{color:var(--accent2);font-weight:800}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#fa243c,#ff9966);display:grid;place-items:center;color:#fff;font-size:17px;font-weight:800}
+.top{display:flex;justify-content:space-between;align-items:center}
+.note{font-size:11.5px;color:var(--sub);margin-top:16px;line-height:1.5;text-align:center}
+.warn{background:rgba(255,159,10,.14);color:#b36b00;border-radius:14px;padding:12px 14px;font-size:13.5px;margin-top:12px;display:flex;gap:8px;line-height:1.45}
+@media(prefers-color-scheme:dark){.warn{color:#ffb340}}
+.warn.ok{background:rgba(48,185,85,.13);color:#1f8a3b}
+table{width:100%;border-collapse:collapse;font-size:13px;text-align:center}
+th,td{padding:9px 4px;border-bottom:1px solid var(--line)}
+td:first-child,th:first-child{text-align:left;color:var(--sub)}
+td.best{color:var(--accent);font-weight:800}
+.ringbig{position:relative;width:170px;height:170px;margin:6px auto}
+.ringbig svg{width:170px;height:170px;transform:rotate(-90deg)}
+.ringbig div{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ringbig b{font-size:34px;line-height:1}.ringbig span{font-size:12px;color:var(--sub)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="view"></div>
+  <div id="mini"></div>
+  <nav id="tabs"></nav>
+  <div id="ov"></div>
+  <div id="sheet"></div>
+  <div id="toast"></div>
+</div>
+<script>
+"use strict";
+/* ============ アイコン ============ */
+const IC={
+ home:'<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+ search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/>',
+ cal:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+ grad:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"/>',
+ spark:'<path d="M11 3l1.9 5.6L18.5 10.5l-5.6 1.9L11 18l-1.9-5.6L3.5 10.5l5.6-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+ mark:'<path d="M6 3h12v18l-6-4-6 4z"/>',
+ dice:'<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><circle cx="8.5" cy="8.5" r=".8"/><circle cx="15.5" cy="15.5" r=".8"/><circle cx="12" cy="12" r=".8"/><circle cx="15.5" cy="8.5" r=".8"/><circle cx="8.5" cy="15.5" r=".8"/>',
+ wand:'<path d="M4 20L15 9"/><path d="M14 4l1 2.5L17.5 7.5 15 8.5 14 11l-1-2.5L10.5 7.5 13 6.5z"/><path d="M19 13l.6 1.4L21 15l-1.4.6L19 17l-.6-1.4L17 15l1.4-.6z"/>',
+ trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+ send:'<path d="M21 3L10 14M21 3l-7 18-4-8-8-4z"/>',
+ lock:'<rect x="5" y="11" width="14" height="10" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+ users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.8a3.4 3.4 0 0 1 0 6.4M18.5 14.8c1.7.8 2.7 2.5 3 5.2"/>',
+ warn:'<path d="M12 3L2 20h20z"/><path d="M12 10v4.5M12 17.5v.1"/>',
+ bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+ star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+ pen:'<path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z"/>',
+ play:'<path d="M7 4l13 8-13 8z" style="fill:currentColor"/>',
+ x:'<path d="M6 6l12 12M18 6L6 18"/>',
+ swap:'<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
+ leaf:'<path d="M5 19C5 10 10 5 20 4c0 10-5 15-14 15z"/><path d="M5 19L13 11"/>',
+ rocket:'<path d="M12 3c4 2 6 6 5 11l-3 3h-4l-3-3C6 9 8 5 12 3z"/><circle cx="12" cy="10" r="1.6"/><path d="M8 17l-3 4M16 17l3 4"/>',
+ party:'<path d="M4 20l5-14 9 9z"/><path d="M14 4v2M19 8h2M17 3l1 1"/>'
+};
+const ic=(n,s)=>`<svg viewBox="0 0 24 24"${s?` style="${s}"`:''}>${IC[n]}</svg>`;
+/* ============ データ(サンプル) ============ */
+const DAYS=['月','火','水','木','金'], TIMES=['9:00','10:45','13:00','14:45','16:30'];
+const CAT={lib:'教養',lang:'言語',major:'専門',free:'自由'};
+const REQ={lib:20,lang:16,major:64,free:24};
+const STYLE={lec:'講義',dis:'ディスカッション',grp:'グループワーク',onl:'オンデマンド',pro:'実践・PBL'};
+const GOAL={career:'就活・キャリア',abroad:'留学',cert:'資格取得',research:'研究・ゼミ',startup:'起業',global:'国際理解'};
+const PERS={steady:'💪 コツコツ型',challenge:'🚀 チャレンジ型',chill:'🧘 マイペース型',social:'🤝 社交型'};
+// [絵文字,講義名,区分,学部,曜,限,形態,A+率,F率,週負荷h,評価,目的,履修者,定員,成長,楽しさ,良い点,難点,タグ]
+const RAW=[
+['🛍️','マーケティング入門','major','APM',0,0,'dis',22,4,3,'レポート',['career','startup'],118,120,82,78,'事例が多く就活に直結','毎回の予習が必要','マーケ 経営'],
+['📊','データ分析基礎','major','APM',1,1,'pro',14,9,4,'試験',['career','research'],95,80,88,55,'Excelで実践的に学べる','数学が苦手だと大変','データ 統計 AI'],
+['💰','財務会計入門','major','APM',2,0,'lec',10,14,4,'試験',['cert','career'],140,120,75,40,'簿記資格の土台になる','暗記量が多い','会計 資格'],
+['🚀','起業とイノベーション','major','APM',3,2,'pro',30,2,3,'発表',['startup','career'],70,60,90,92,'実際にピッチを作れる','チーム依存度が高い','起業 経営'],
+['🌏','アジア国際関係論','major','APS',0,2,'dis',20,5,3,'レポート',['global','research'],60,80,70,70,'議論が活発で視野が広がる','リーディングが多め','国際関係 文化'],
+['🏝️','観光まちづくり論','major','APS',1,3,'grp',28,3,2,'発表',['global','career'],75,80,72,85,'フィールドワークが楽しい','グループ調整が必要','観光 文化'],
+['🌱','環境とサステナビリティ','major','APS',2,3,'lec',35,2,2,'レポート',['global','research'],110,150,65,60,'出席とレポート中心で取り組みやすい','内容がやや抽象的','環境 SDGs'],
+['🧠','心理学入門','lib','ALL',3,1,'onl',38,2,1,'試験',['research'],260,200,50,66,'オンデマンドで自分のペースで進められる','人気で抽選になりやすい','心理'],
+['📚','日本の歴史と文化','lib','ALL',4,0,'lec',40,1,1,'レポート',['global'],160,200,40,58,'評価は期末レポートのみ','やや単調','文化 日本'],
+['🎤','パブリックスピーキング','lang','ALL',0,3,'grp',26,3,3,'発表',['career','abroad'],45,40,85,88,'人前で話す自信がつく','毎週発表がある','英語 発表'],
+['✈️','留学準備英語(IELTS)','lang','ALL',1,0,'pro',12,8,5,'試験',['abroad','cert'],50,50,92,45,'スコアが確実に伸びる','課題量が非常に多い','英語 留学 資格'],
+['🗣️','English Discussion','lang','ALL',2,1,'dis',24,4,3,'発表',['abroad','global'],40,40,78,90,'多様な視点で議論できる','英語に自信がないと緊張する','英語 ディスカッション'],
+['🇯🇵','ビジネス日本語','lang','ALL',3,4,'lec',30,3,2,'レポート',['career'],80,100,60,50,'敬語やメールが実務的','内容が基礎寄り','日本語'],
+['🤖','AIと社会','free','ALL',4,2,'onl',36,2,1,'レポート',['career','research'],240,180,78,80,'生成AIの使い方を学べる','抽選倍率が高い','AI データ'],
+['🎨','デザイン思考ワークショップ','free','ALL',1,4,'grp',32,2,2,'発表',['startup','career'],55,60,76,94,'アイデア出しが楽しい','準備に時間がかかる','デザイン 起業'],
+['🏃','スポーツ・ウェルネス','free','ALL',2,4,'pro',55,0,1,'出席',[],90,100,20,82,'出席でほぼ単位が取れる','学びは少なめ','運動'],
+['🎸','音楽と社会','free','ALL',4,3,'lec',48,1,1,'レポート',[],70,100,25,86,'音楽好きなら楽しい','専門的な深さは弱い','音楽 文化'],
+['📈','統計学','major','APM',0,1,'lec',8,18,5,'試験',['research','cert'],130,100,85,28,'分析力が確実につく','F率が高く難しい','統計 データ'],
+['🧮','経営戦略論','major','APM',1,2,'dis',18,6,3,'試験',['career'],105,100,88,68,'ケース分析が面白い','予習量が多め','経営 戦略'],
+['🤝','組織行動論','major','APM',3,0,'grp',25,4,3,'レポート',['career'],85,100,74,76,'リーダーシップを実践できる','チーム次第で負荷が変わる','経営 心理'],
+['🌐','国際ビジネス','major','APM',2,2,'dis',21,5,3,'発表',['global','career','abroad'],90,100,86,80,'海外事例が豊富','英語資料が多い','経営 英語 国際関係'],
+['🧩','プログラミング入門','free','ALL',3,3,'pro',27,5,4,'試験',['career','startup'],100,90,90,62,'Pythonが書けるようになる','最初のつまずきが大きい','AI データ プログラミング'],
+['🍜','アジアの食文化','major','APS',4,1,'lec',42,1,1,'レポート',['global'],95,100,45,84,'映像や試食で楽しく学べる','評価基準がやや曖昧','文化 観光'],
+['⚖️','ビジネスエシックス','major','APM',1,3,'dis',30,3,2,'レポート',['career'],85,100,70,72,'議論で考えが深まる','毎回リアクションペーパーがある','経営 倫理'],
+['🗾','日本経済論','lib','ALL',0,4,'onl',33,3,2,'試験',['career'],150,160,62,52,'ニュースが理解しやすくなる','範囲が広い','経営 日本'],
+['🔬','研究方法論','major','ALL',3,4,'lec',16,7,4,'レポート',['research'],45,50,80,38,'ゼミや卒論に役立つ','内容が難しめ','研究 統計'],
+['📣','SNSマーケティング','free','ALL',2,2,'pro',34,2,2,'発表',['career','startup'],92,60,72,93,'実際に運用して学べる','人気で抽選が難しい','マーケ AI SNS'],
+['🌍','グローバルリーダーシップ','major','APS',2,2,'grp',27,3,3,'発表',['global','abroad'],55,60,80,82,'多国籍チームで学べる','日程調整が大変','国際関係 経営'],
+['🎬','映像表現入門','free','ALL',1,1,'pro',45,1,2,'発表',[],35,40,40,90,'作品を1本完成できる','機材の予約が必要','デザイン 映像'],
+['🧘','マインドフルネス','free','ALL',0,0,'lec',58,0,1,'出席',[],130,100,18,70,'リラックスできる','学びは浅め','心理 運動']
+];
+const COURSES=RAW.map((r,i)=>({id:i,em:r[0],name:r[1],cat:r[2],fac:r[3],day:r[4],per:r[5],style:r[6],ap:r[7],f:r[8],load:r[9],assess:r[10],goals:r[11],enr:r[12],cap:r[13],g:r[14],fn:r[15],pro:r[16],con:r[17],tags:r[18].split(' '),cr:2,n:r[13]<=40?7:Math.round(r[12]*.3)}));
+const FRIENDS=[{n:'Aya',e:'🦊',c:[0,9,13,26]},{n:'Ken',e:'🐻',c:[3,13,20,14]},{n:'Mina',e:'🐰',c:[5,11,22,7]}];
+const cover=c=>{const h=(c.id*47+8)%360;return `background:linear-gradient(135deg,hsl(${h},82%,62%),hsl(${(h+38)%360},86%,54%))`};
+/* ============ 状態 ============ */
+const KEY='risyu10x_v1';
+const DEF=()=>({prof:{name:'あなた',fac:'APM',year:2,goal:'career',pers:'challenge',styles:['dis','grp'],limit:20,friends:true,mode:50,earned:{lib:12,lang:10,major:26,free:6},seen:false},
+ plans:[[],[],[]],cur:0,saved:[],points:3,unlocked:[],reviews:{},tab:'home',seg:'grid',f:{q:'',chip:'all',sort:'total',slot:null},chat:[]});
+let S;try{S=Object.assign(DEF(),JSON.parse(localStorage.getItem(KEY)||'{}'));S.prof=Object.assign(DEF().prof,S.prof)}catch(e){S=DEF()}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s), clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+/* ============ スコア・分析 ============ */
+const ecat=c=>(c.fac!=='ALL'&&c.fac!==S.prof.fac)?'free':c.cat;           // 他学部の専門は自由科目扱い
+const cross=c=>c.fac!=='ALL'&&c.fac!==S.prof.fac;
+function sc(c){
+  const p=S.prof;
+  const easy=Math.round(.4*Math.min(100,c.ap*2.5)+.3*Math.max(0,100-c.f*5)+.3*(100-(c.load-1)*22));
+  let g=c.g*.85+(c.goals.includes(p.goal)?15:0), fn=c.fn*.9+(p.styles.includes(c.style)?10:0);
+  if(p.pers==='challenge')g+=c.g>75?6:0; if(p.pers==='chill')fn+=(c.style==='onl'||c.load<=2)?8:0;
+  if(p.pers==='social')fn+=(c.style==='grp'||c.style==='dis')?8:0; if(p.pers==='steady')fn+=c.assess==='レポート'?6:0;
+  g=clamp(Math.round(g),0,100);fn=clamp(Math.round(fn),0,100);
+  const we=100-p.mode,wg=p.mode,wf=40;
+  return {easy,g,fn,total:Math.round((we*easy+wg*g+wf*fn)/(we+wg+wf))};
+}
+function risk(c){const r=c.enr/c.cap;return r<.9?5:clamp(Math.round((r-.8)*200),5,95)}
+const riskLabel=r=>r>=60?'高':r>=30?'中':'低';
+function remaining(){const e=S.prof.earned,o={};for(const k in REQ)o[k]=Math.max(0,REQ[k]-e[k]);return o}
+const plan=()=>S.plans[S.cur];
+const inPlan=id=>plan().includes(id);
+const slotOwner=(d,pp,ids=plan())=>ids.map(i=>COURSES[i]).find(c=>c.day===d&&c.per===pp);
+function stats(ids){
+  const cs=ids.map(i=>COURSES[i]),n=cs.length||1,ss=cs.map(sc);
+  const days=new Set(cs.map(c=>c.day)),wk=weekLoad(ids);
+  return {cr:cs.length*2,easy:Math.round(ss.reduce((a,s)=>a+s.easy,0)/n),g:Math.round(ss.reduce((a,s)=>a+s.g,0)/n),fn:Math.round(ss.reduce((a,s)=>a+s.fn,0)/n),
+    off:5-days.size,risky:cs.filter(c=>risk(c)>=60).length,peak:Math.max(...wk),avg:Math.round(wk.reduce((a,b)=>a+b,0)/15),wk};
+}
+function weekLoad(ids){
+  const w=Array(15).fill(0);
+  ids.map(i=>COURSES[i]).forEach(c=>{
+    for(let i=0;i<15;i++)w[i]+=c.load;
+    const sp=c.assess==='試験'?[[7,1.6],[14,2.2]]:c.assess==='レポート'?[[6,1],[13,1.8]]:c.assess==='発表'?[[5,1.2],[12,1.8]]:[];
+    sp.forEach(([k,m])=>w[k]+=c.load*m);
+  });
+  return w.map(v=>Math.round(v));
+}
+/* 時間割自動生成 */
+function buildPlan(o={}){
+  const p=S.prof,w=o.w||{e:100-p.mode,g:p.mode,f:40},rem=remaining();
+  const target=o.target||p.limit-4,blocked=new Set(o.block||[]);
+  const val=c=>{const s=sc(c);let v=(w.e*s.easy+w.g*s.g+w.f*s.fn)/(w.e+w.g+w.f);
+    (o.tags||[]).forEach(t=>{if(c.tags.includes(t)||c.name.includes(t))v+=30});
+    if(o.style&&c.style===o.style)v+=14;
+    if(o.goal&&c.goals.includes(o.goal))v+=18;
+    v+=rem[ecat(c)]>0?10+Math.min(15,rem[ecat(c)]/4):-25;
+    if(risk(c)>=60)v-=14; if(o.jitter)v+=Math.random()*o.jitter; return v};
+  if(o.free&&blocked.size<o.free){
+    const ds=[0,1,2,3,4].filter(d=>!blocked.has(d)).map(d=>({d,s:COURSES.filter(c=>c.day===d).reduce((a,c)=>a+Math.max(0,val(c)-50),0)})).sort((a,b)=>a.s-b.s);
+    while(blocked.size<o.free&&ds.length)blocked.add(ds.shift().d);
+  }
+  const out=[];let cr=0;
+  COURSES.slice().sort((a,b)=>val(b)-val(a)).forEach(c=>{
+    if(cr+2>target||blocked.has(c.day)||slotOwner(c.day,c.per,out))return;
+    out.push(c.id);cr+=2;
+  });
+  return out;
+}
+/* ============ UI部品 ============ */
+function ring(v,color,label,sz){
+  const r=30,L=2*Math.PI*r;
+  return `<div class="ringw"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--card2)" stroke-width="8"/><circle cx="40" cy="40" r="${r}" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${L*v/100} ${L}" transform="rotate(-90 40 40)"/><text x="40" y="46" text-anchor="middle" font-size="20" font-weight="800" fill="var(--text)" stroke="none">${v}</text></svg>${label}</div>`;
+}
+const pills=(s)=>`<span class="pill e">楽 ${s.easy}</span><span class="pill g">成長 ${s.g}</span><span class="pill f">楽しさ ${s.fn}</span>`;
+function row(c){
+  const s=sc(c),r=risk(c),on=inPlan(c.id);
+  return `<div class="row" data-a="detail" data-id="${c.id}">
+   <div class="cover" style="${cover(c)}">${c.em}</div>
+   <div class="m"><b>${c.name}</b><span>${DAYS[c.day]}${c.per+1}限 ・ ${STYLE[c.style]} ・ ${c.cr}単位</span>
+   <div class="pills">${pills(s)}${r>=60?'<span class="pill risk">抽選注意</span>':''}${cross(c)?'<span class="pill cross">他学部</span>':''}</div></div>
+   <button class="circ ${on?'on':''}" data-a="toggle" data-id="${c.id}" aria-label="${on?'履修から外す':'履修に追加'}">${ic(on?'check':'plus')}</button></div>`;
+}
+function tile(c,badge){
+  const s=sc(c);
+  return `<div class="tile" data-a="detail" data-id="${c.id}"><div class="cover" style="${cover(c)}">${c.em}<span class="badge">${badge||'おすすめ度 '+s.total}</span></div><b>${c.name}</b><span>${DAYS[c.day]}${c.per+1}限 ・ ${STYLE[c.style]}</span></div>`;
+}
+function miniGrid(ids){
+  let h='';for(let pp=0;pp<5;pp++)for(let d=0;d<5;d++){const c=slotOwner(d,pp,ids);h+=`<i style="${c?cover(c):''}"></i>`}
+  return `<div class="mg">${h}</div>`;
+}
+let toastT;
+function toast(msg,act,fn){
+  const t=$('#toast');t.innerHTML=`<span>${msg}</span>${act?`<button id="tact">${act}</button>`:''}`;t.classList.add('on');
+  if(act)$('#tact').onclick=()=>{fn();t.classList.remove('on')};
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),act?4200:2200);
+}
+function openSheet(html){$('#sheet').innerHTML=`<div class="grab"></div>${html}`;$('#sheet').classList.add('on');$('#ov').classList.add('on');$('#sheet').scrollTop=0}
+function closeSheet(){$('#sheet').classList.remove('on');$('#ov').classList.remove('on')}
+/* ============ 履修操作 ============ */
+function addCourse(id){
+  const c=COURSES[id],ids=plan(),o=slotOwner(c.day,c.per);
+  if(ids.includes(id)){S.plans[S.cur]=ids.filter(i=>i!==id);save();render();return}
+  if(o){toast(`⚠ ${DAYS[c.day]}${c.per+1}限は「${o.name}」と重複`,'入れ替える',()=>{S.plans[S.cur]=ids.filter(i=>i!==o.id).concat(id);save();render();renderSheetIfOpen(id)});return}
+  if(ids.length*2+2>S.prof.limit){toast(`履修上限(${S.prof.limit}単位)を超えます`);return}
+  ids.push(id);save();toast(`「${c.name}」を追加しました`);render();
+}
+let sheetId=null;
+function renderSheetIfOpen(id){if($('#sheet').classList.contains('on')&&sheetId===id)detail(id)}
+function aiSummary(c){
+  const s=sc(c),r=risk(c),parts=[];
+  parts.push(s.easy>=70?'負荷は軽めで単位を取りやすい講義です。':s.easy>=50?'標準的な難易度の講義です。':'やや手応えのある講義で、計画的な学習が必要です。');
+  parts.push(`良い点:${c.pro}。難点:${c.con}。`);
+  if(c.goals.includes(S.prof.goal))parts.push(`あなたの目的「${GOAL[S.prof.goal]}」に合致します。`);
+  if(S.prof.styles.includes(c.style))parts.push('好みの授業形態です。');
+  if(r>=60)parts.push(`抽選倍率が高く、落選リスクは${r}%です。`);
+  return parts.join('');
+}
+function altFor(c){
+  return COURSES.filter(x=>x.id!==c.id&&risk(x)<30&&(x.tags.some(t=>c.tags.includes(t))||x.day===c.day&&x.per===c.per)).sort((a,b)=>sc(b).total-sc(a).total)[0];
+}
+function reviewsOf(c){
+  const base=[[Math.min(5,Math.round(c.fn/20)),`${c.pro}。`],[Math.max(2,Math.round(sc(c).easy/22)),`${c.con}。それでも${sc(c).easy>=60?'おすすめです':'覚悟して取る価値はあります'}。`],[Math.min(5,Math.round((c.g+c.fn)/40)),`${c.assess}中心の評価。${c.load}時間/週くらいかかりました。`]];
+  return base.concat(S.reviews[c.id]||[]);
+}
+function detail(id){
+  sheetId=id;const c=COURSES[id],s=sc(c),r=risk(c),on=inPlan(id),saved=S.saved.includes(id),unl=S.unlocked.includes(id);
+  const alt=r>=30?altFor(c):null,fr=S.prof.friends?FRIENDS.filter(f=>f.c.includes(id)):[];
+  const priv=c.n<10;
+  openSheet(`
+  <div class="dh"><div class="cover" style="${cover(c)}">${c.em}</div><div><h3>${c.name}</h3><div class="sub">${CAT[c.cat]}科目 ・ ${c.fac==='ALL'?'全学部':c.fac} ・ ${c.cr}単位<br>${DAYS[c.day]}曜${c.per+1}限(${TIMES[c.per]}〜) ・ ${STYLE[c.style]}</div></div></div>
+  <div class="rings">${ring(s.easy,'var(--easy)','楽さ')}${ring(s.g,'var(--grow)','成長')}${ring(s.fn,'var(--fun)','楽しさ')}</div>
+  <div class="card" style="margin-top:8px">
+   <div class="kv"><span>A+取得率</span><b>${priv?'データ不足':c.ap+'%'}</b></div>
+   <div class="kv"><span>F率(不合格)</span><b style="color:${c.f>=10?'var(--accent)':'inherit'}">${priv?'データ不足':c.f+'%'}</b></div>
+   <div class="kv"><span>週あたり学習時間</span><b>約${c.load}時間</b></div>
+   <div class="kv"><span>評価方法</span><b>${c.assess}</b></div>
+   <div class="kv"><span>抽選落ちリスク</span><b style="color:${r>=60?'var(--warn)':'inherit'}">${riskLabel(r)}(${r}%)</b></div>
+  </div>
+  ${priv?'<p class="note" style="text-align:left;margin-top:8px">🔒 回答が10人未満のため、個人が特定されないよう成績分布は参考表示のみです。</p>':''}
+  <div class="ai"><b>${ic('spark')}AIサマリー</b>${aiSummary(c)}</div>
+  ${alt?`<div class="warn">${ic('warn')}<div>落選に備えて代替候補:<br><b style="cursor:pointer;text-decoration:underline" data-a="detail" data-id="${alt.id}">${alt.em} ${alt.name}</b>(リスク${riskLabel(risk(alt))}・${DAYS[alt.day]}${alt.per+1}限)</div></div>`:''}
+  ${fr.length?`<div class="warn ok">${ic('users')}<div>友達が履修予定:${fr.map(f=>f.e+f.n).join('、')}</div></div>`:''}
+  <h2>先輩レビュー <small data-a="review" data-id="${id}">${ic('pen')} 投稿</small></h2>
+  ${reviewsOf(c).map((r,i)=>`<div class="rv ${i>0&&!unl?'lock':''}"><span class="st">${'★'.repeat(r[0])}${'☆'.repeat(5-r[0])}</span><br>${r[1]}</div>`).join('')}
+  ${!unl?`<div class="act"><button class="btn g" data-a="unlock" data-id="${id}">${ic('lock')} 全レビューを解放(1pt・所持${S.points}pt)</button></div>`:''}
+  <div class="act"><button class="btn g" data-a="mark" data-id="${id}">${ic('mark')} ${saved?'保存済み':'保存'}</button><button class="btn" data-a="toggle" data-id="${id}">${ic(on?'check':'plus')} ${on?'履修中(外す)':'履修に追加'}</button></div>
+  <p class="note">※サンプルデータによるデモです。実際の成績・口コミではありません。</p>`);
+}
+function reviewForm(id){
+  openSheet(`<h3 style="margin:0 0 4px;font-size:21px">${COURSES[id].em} レビューを投稿</h3><p class="sub">投稿すると +3pt。他の講義のレビュー解放に使えます。</p>
+  <label class="f">満足度</label><div class="opts" id="stars">${[1,2,3,4,5].map(n=>`<button class="chip ${n===4?'on':''}" data-a="star" data-n="${n}">${'★'.repeat(n)}</button>`).join('')}</div>
+  <label class="f">取得した成績(匿名で集計されます)</label><select class="in" id="grade"><option>回答しない</option><option>A+</option><option>A</option><option>B</option><option>C</option><option>F</option></select>
+  <label class="f">コメント</label><input class="in" id="rtext" placeholder="例:課題は多いけど先生が親切">
+  <div class="act"><button class="btn" data-a="postrv" data-id="${id}">${ic('send')} 投稿する</button></div>`);
+}
+/* ============ 画面 ============ */
+const TABS=[['home','ホーム','home'],['explore','探す','search'],['time','時間割','cal'],['grad','卒業','grad'],['ai','AI相談','spark']];
+function renderTabs(){$('#tabs').innerHTML=TABS.map(t=>`<button class="${S.tab===t[0]?'on':''}" data-a="tab" data-t="${t[0]}">${ic(t[2])}${t[1]}</button>`).join('')}
+function renderMini(){
+  const st=stats(plan()),pc=Math.min(100,st.cr/S.prof.limit*100);
+  $('#mini').innerHTML=`<div class="art">${ic('play','font-size:20px')}</div><div class="t"><b>${'ABC'[S.cur]}案 ・ ${st.cr} / ${S.prof.limit}単位</b><span>休み${st.off}日 ・ 楽さ${st.easy} ・ 成長${st.g}</span></div><button data-a="tab" data-t="time" aria-label="時間割を開く">${ic('cal')}</button><div class="bar" style="width:${pc}%"></div>`;
+}
+function vHome(){
+  const p=S.prof,st=stats(plan());
+  const top=COURSES.slice().sort((a,b)=>sc(b).total-sc(a).total);
+  const best=top.filter(c=>!inPlan(c.id)).slice(0,8);
+  const cross=top.filter(c=>c.fac!=='ALL'&&c.fac!==p.fac).slice(0,6);
+  const hot=plan().map(i=>COURSES[i]).filter(c=>risk(c)>=60);
+  const bal=COURSES.filter(c=>sc(c).easy>=65&&sc(c).g>=65).sort((a,b)=>sc(b).total-sc(a).total).slice(0,5);
+  const lf=FRIENDS.filter(f=>f.c.some(i=>!inPlan(i)));
+  return `<div class="top"><div><div class="sub">${new Date().toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'short'})}</div><h1>ホーム</h1></div><button class="avatar" data-a="profile" aria-label="プロフィール">${p.name.slice(0,1)}</button></div>
+  <div class="hero"><div class="k">${ic('spark')} AIおすすめ時間割</div><div class="big">${GOAL[p.goal]}に強い、<br>あなた専用の履修案</div>
+   <div class="stats"><div><b>${st.cr}</b>単位</div><div><b>${st.easy}</b>楽さ</div><div><b>${st.g}</b>成長</div><div><b>${st.off}</b>休み日</div></div>
+   <button class="btn w" data-a="autoplan">${ic('wand')} 自動で作る</button> <button class="btn w" data-a="tab" data-t="time" style="background:rgba(255,255,255,.25);color:#fff">${ic('cal')} 見る</button></div>
+  <div class="card" style="margin-top:14px"><div class="top"><b>${ic('leaf','color:var(--easy)')} 楽さ</b><b>成長 ${ic('rocket','color:var(--grow)')}</b></div>
+   <input type="range" min="0" max="100" value="${p.mode}" data-a="mode"><div class="sub" id="modeTx" style="text-align:center">${modeText(p.mode)}</div></div>
+  ${hot.length?`<div class="warn">${ic('warn')}<div>抽選落ちリスクが高い講義が${hot.length}件:${hot.map(c=>c.name).join('、')}</div></div>`:''}
+  <h2>あなたへのおすすめ <small data-a="tab" data-t="explore">すべて見る</small></h2><div class="shelf">${best.map(c=>tile(c)).join('')}</div>
+  <h2>楽 × 成長のベストバランス</h2><div class="card" style="padding:4px 16px">${bal.map(row).join('')}</div>
+  <h2>他学部の発見</h2><div class="shelf">${cross.map(c=>tile(c,c.fac+'の講義')).join('')}</div>
+  ${p.friends?`<h2>友達の履修</h2><div class="card">${lf.map(f=>`<div class="row"><div class="cover" style="width:42px;height:42px;font-size:22px;background:var(--card2)">${f.e}</div><div class="m"><b>${f.n}</b><span>${f.c.slice(0,3).map(i=>COURSES[i].name).join('・')}</span></div></div>`).join('')}</div>`:''}
+  <p class="note">サンプルデータのデモ版です。実際の成績・口コミは含まれません。</p>`;
+}
+const modeText=m=>m<30?'とにかく楽に単位を取りたい':m<70?'楽さと成長のバランス重視':'ガッツリ成長したい';
+const CHIPS=[['all','すべて',null],['easy','楽単','leaf'],['grow','成長','rocket'],['fun','楽しい','party'],['lib','教養'],['lang','言語'],['major','専門'],['free','自由'],['cross','他学部','users'],['mine','好みの形態'],['saved','保存','mark']];
+function filtered(){
+  const f=S.f;let l=COURSES.slice();
+  if(f.q)l=l.filter(c=>(c.name+c.tags.join('')+STYLE[c.style]).includes(f.q));
+  const ch=f.chip;
+  if(['lib','lang','major','free'].includes(ch))l=l.filter(c=>c.cat===ch);
+  if(ch==='easy')l=l.filter(c=>sc(c).easy>=65);
+  if(ch==='grow')l=l.filter(c=>sc(c).g>=75);
+  if(ch==='fun')l=l.filter(c=>sc(c).fn>=80);
+  if(ch==='cross')l=l.filter(cross);
+  if(ch==='mine')l=l.filter(c=>S.prof.styles.includes(c.style));
+  if(ch==='saved')l=l.filter(c=>S.saved.includes(c.id));
+  if(f.slot)l=l.filter(c=>c.day===f.slot[0]&&c.per===f.slot[1]);
+  const key={total:c=>sc(c).total,easy:c=>sc(c).easy,grow:c=>sc(c).g,fun:c=>sc(c).fn,ap:c=>c.ap}[f.sort];
+  return l.sort((a,b)=>key(b)-key(a));
+}
+function vExplore(){
+  const f=S.f,l=filtered();
+  return `<h1>探す</h1>
+  <div class="search">${ic('search')}<input id="q" placeholder="講義名・キーワード(例:AI、英語)" value="${f.q}"></div>
+  <div class="chips">${CHIPS.map(c=>`<button class="chip ${f.chip===c[0]?'on':''}" data-a="chip" data-c="${c[0]}">${c[2]?ic(c[2]):''}${c[1]}</button>`).join('')}</div>
+  <div class="chips" style="margin-top:2px">${[['total','おすすめ順'],['easy','楽さ順'],['grow','成長順'],['fun','楽しさ順'],['ap','A+率順']].map(s=>`<button class="chip ${f.sort===s[0]?'on':''}" style="font-size:12px;padding:5px 11px" data-a="sort" data-s="${s[0]}">${s[1]}</button>`).join('')}</div>
+  ${f.slot?`<div class="warn" style="background:var(--card);color:var(--text)">${ic('cal')}<div>${DAYS[f.slot[0]]}曜${f.slot[1]+1}限の候補 <b data-a="clrslot" style="color:var(--accent);cursor:pointer">解除</b></div></div>`:''}
+  <div class="card" style="padding:4px 16px;margin-top:10px">${l.length?l.map(row).join(''):'<p class="sub" style="padding:24px;text-align:center">該当する講義がありません</p>'}</div>
+  <p class="note">${l.length}件 ・ スコアはプロフィールに合わせて変わります</p>`;
+}
+function vTime(){
+  const st=stats(plan());
+  const seg=`<div class="seg">${[['grid','時間割','cal'],['load','学期の負荷','bolt'],['cmp','案を比較','swap']].map(s=>`<button class="${S.seg===s[0]?'on':''}" data-a="seg" data-s="${s[0]}">${ic(s[2])}${s[1]}</button>`).join('')}</div>`;
+  const pl=`<div class="pl">${S.plans.map((ids,i)=>`<button class="${S.cur===i?'on':''}" data-a="plan" data-i="${i}">${'ABC'[i]}案<small>${ids.length*2}単位</small></button>`).join('')}</div>`;
+  let body='';
+  if(S.seg==='grid'){
+    let g='<div class="grid"><div></div>'+DAYS.map(d=>`<div class="h">${d}</div>`).join('');
+    for(let pp=0;pp<5;pp++){g+=`<div class="p">${pp+1}</div>`;for(let d=0;d<5;d++){const c=slotOwner(d,pp);
+      g+=c?`<div class="cell f" style="${cover(c)}" data-a="detail" data-id="${c.id}"><div><i>${c.em}</i><small>${c.name}</small></div></div>`:`<div class="cell" data-a="slot" data-d="${d}" data-p="${pp}">${ic('plus')}</div>`}}
+    g+='</div>';
+    body=`${g}<div class="tools"><button class="btn sm" data-a="autoplan">${ic('wand')} AI最適化</button><button class="btn sm g" data-a="gacha">${ic('dice')} 時間割ガチャ</button><button class="btn sm g" data-a="clear">${ic('trash')} クリア</button></div>
+    <div class="card"><div class="kv"><span>合計単位</span><b>${st.cr} / ${S.prof.limit}</b></div><div class="kv"><span>全休の日</span><b>${st.off}日</b></div><div class="kv"><span>平均スコア</span><b>楽${st.easy} / 成長${st.g} / 楽しさ${st.fn}</b></div><div class="kv"><span>抽選注意の講義</span><b>${st.risky}件</b></div></div>
+    <p class="note">空きマスをタップすると、その時間の候補が見られます。重複は自動で検知します。</p>`;
+  }else if(S.seg==='load'){
+    const th=Math.max(28,Math.round(st.avg*1.45)),over=st.wk.map((v,i)=>[v,i+1]).filter(x=>x[0]>th);
+    body=`<h2 style="margin-top:8px">週ごとの学習時間 <small style="color:var(--sub)">目安</small></h2>
+    <div class="card"><div class="wk">${st.wk.map((v,i)=>`<div class="${v>th?'':'ok'}" style="height:${Math.max(4,v/Math.max(...st.wk)*100)}%"><span>${i+1}</span></div>`).join('')}</div><div class="legend"><span>横軸:学期の週</span><span style="color:var(--easy)">■ 余裕</span><span style="color:var(--accent)">■ 過密(${th}h超)</span></div></div>
+    ${over.length?`<div class="warn">${ic('warn')}<div>第${over.map(o=>o[1]).join('・')}週が過密です(最大${st.peak}時間)。試験・課題が重なるため、早めの準備を。</div></div>`:`<div class="warn ok">${ic('check')}<div>無理のない負荷バランスです。</div></div>`}`;
+  }else{
+    const ss=S.plans.map(ids=>stats(ids)),best=(k,hi=true)=>{const v=ss.map(s=>s[k]);const t=hi?Math.max(...v):Math.min(...v);return i=>ss[i][k]===t?'best':''};
+    const rows=[['単位','cr',true],['楽さ','easy',true],['成長','g',true],['楽しさ','fn',true],['休みの日','off',true],['最大負荷(h/週)','peak',false],['抽選注意','risky',false]];
+    body=`<div class="card" style="margin-top:8px"><table><tr><th></th>${[0,1,2].map(i=>`<th>${'ABC'[i]}案</th>`).join('')}</tr>${rows.map(r=>{const b=best(r[1],r[2]);return `<tr><td>${r[0]}</td>${[0,1,2].map(i=>`<td class="${b(i)}">${ss[i][r[1]]}</td>`).join('')}</tr>`}).join('')}</table></div>
+    <div class="tools"><button class="btn sm" data-a="gen3">${ic('wand')} AIで3案を作る</button></div><p class="note">赤字は各項目で最も良い案です。</p>`;
+  }
+  return `<h1>時間割</h1>${pl}${seg}${body}`;
+}
+function vGrad(){
+  const p=S.prof,rem=remaining(),pc={};
+  plan().forEach(i=>{const k=ecat(COURSES[i]);pc[k]=(pc[k]||0)+2});
+  const E=Object.values(p.earned).reduce((a,b)=>a+b,0),P=Object.values(pc).reduce((a,b)=>a+b,0),T=124;
+  const semLeft=Math.max(1,(4-p.year)*2+1),need=Math.max(0,T-E),perSem=Math.ceil(need/semLeft);
+  const R=70,L=2*Math.PI*R;
+  const cols={lib:'#ff9f0a',lang:'#0a84ff',major:'#fa243c',free:'#af52de'};
+  const gaps=Object.keys(rem).filter(k=>rem[k]-(pc[k]||0)>0).sort((a,b)=>rem[b]-rem[a]);
+  const recs=gaps.slice(0,2).flatMap(k=>COURSES.filter(c=>ecat(c)===k&&!plan().includes(c.id)).sort((a,b)=>sc(b).total-sc(a).total).slice(0,2));
+  return `<h1>卒業ナビ</h1><p class="sub">卒業に必要な124単位(サンプル設定)</p>
+  <div class="ringbig"><svg viewBox="0 0 170 170"><circle cx="85" cy="85" r="${R}" fill="none" stroke="var(--card2)" stroke-width="16"/><circle cx="85" cy="85" r="${R}" fill="none" stroke="var(--accent2)" stroke-width="16" stroke-linecap="round" stroke-dasharray="${L*(E+P)/T} ${L}" opacity=".45"/><circle cx="85" cy="85" r="${R}" fill="none" stroke="var(--accent)" stroke-width="16" stroke-linecap="round" stroke-dasharray="${L*E/T} ${L}"/></svg><div><b>${E+P}</b><span>/ ${T}単位</span><span style="color:var(--accent)">取得${E} + 今期${P}</span></div></div>
+  <div class="${perSem<=20?'warn ok':'warn'}">${ic(perSem<=20?'check':'warn')}<div>${p.year}年秋以降あと<b>${semLeft}学期</b>。卒業まで<b>毎学期 約${perSem}単位</b>で到達できます。${perSem>20?'上限を超えるため、早めの追い上げが必要です。':''}</div></div>
+  <h2>区分ごとの進捗</h2><div class="card">${Object.keys(REQ).map(k=>{const e=p.earned[k],q=pc[k]||0,r=REQ[k];
+   return `<div style="margin:6px 0 14px"><div class="top" style="margin-bottom:6px"><b>${CAT[k]}</b><span class="step"><button data-a="earn" data-k="${k}" data-d="-2" aria-label="減らす">−</button><span class="sub" style="min-width:76px;text-align:center"><b style="color:var(--text)">${e}</b>(+${q}) / ${r}</span><button data-a="earn" data-k="${k}" data-d="2" aria-label="増やす">+</button></span></div>
+   <div class="bar"><i style="width:${Math.min(100,e/r*100)}%;background:${cols[k]}"></i><i style="width:${Math.min(100-e/r*100,q/r*100)}%;background:${cols[k]};opacity:.38"></i></div>${e+q>=r?`<span class="sub" style="color:var(--ok)">✓ 充足見込み</span>`:`<span class="sub">あと${r-e-q}単位</span>`}</div>`}).join('')}</div>
+  <p class="note" style="text-align:left">濃い色=取得済み、薄い色=今期の${'ABC'[S.cur]}案。±ボタンで取得単位を修正できます。</p>
+  ${recs.length?`<h2>不足を埋めるおすすめ</h2><div class="card" style="padding:4px 16px">${recs.map(row).join('')}</div>`:''}`;
+}
+function vAI(){
+  const ex=['週2日休みで、マーケとAIを学びたい','金曜は入れたくない。楽に単位がほしい','留学に向けて英語を強化したい','ディスカッション中心で成長したい'];
+  return `<h1>AI履修アドバイザー</h1><p class="sub">希望を話しかけると、時間割を3パターン提案します</p>
+  <div class="msgs">
+   <div class="b ai">こんにちは!${S.prof.name}さんの履修をサポートします。曜日・興味・目標単位数など、気軽に教えてください。</div>
+   ${S.chat.map((m,i)=>m.plans?m.plans.map((pl,j)=>planCard(pl,i,j)).join(''):`<div class="b ${m.r}">${m.t}</div>`).join('')}
+  </div>
+  <div class="chips">${ex.map(e=>`<button class="chip" data-a="ask" data-t="${e}">${e}</button>`).join('')}</div>
+  <div class="composer"><input class="in" id="ci" placeholder="例:週2日休みでデータ系を学びたい"><button class="send" data-a="send" aria-label="送信">${ic('send')}</button></div>`;
+}
+function planCard(pl,mi,j){
+  const st=stats(pl.ids);
+  return `<div class="pc"><b>${pl.title}</b><div class="sub">${pl.desc}</div>${miniGrid(pl.ids)}<div class="pills"><span class="pill">${st.cr}単位</span>${pills({easy:st.easy,g:st.g,fn:st.fn})}<span class="pill">休み${st.off}日</span></div><div class="act" style="margin-top:12px"><button class="btn sm" style="flex:1;justify-content:center" data-a="apply" data-m="${mi}" data-j="${j}">${ic('check')} ${'ABC'[S.cur]}案に適用</button></div></div>`;
+}
+function advise(text){
+  const o={tags:[],block:[]};let m;
+  if(m=text.match(/週\s*(\d)\s*日?\s*(休|オフ)/))o.free=+m[1];
+  else if(m=text.match(/週\s*(\d)\s*日?\s*(登校|通学)/))o.free=5-(+m[1]);
+  DAYS.forEach((d,i)=>{if(new RegExp(d+'曜?日?(は|を)?(休|オフ|なし|入れ|いらな|避)').test(text))o.block.push(i)});
+  const tagSet=new Set(COURSES.flatMap(c=>c.tags));tagSet.forEach(t=>{if(text.includes(t))o.tags.push(t)});
+  if(/マーケ/.test(text)&&!o.tags.includes('マーケ'))o.tags.push('マーケ');
+  if(/留学|IELTS|TOEFL/i.test(text)){o.goal='abroad';o.tags.push('留学')}
+  if(/就活|キャリア|就職/.test(text))o.goal='career';
+  if(/起業/.test(text))o.goal='startup';
+  if(/資格/.test(text))o.goal='cert';
+  if(/ディスカッション|議論/.test(text))o.style='dis';else if(/グループ/.test(text))o.style='grp';else if(/オンライン|オンデマンド/.test(text))o.style='onl';else if(/実践|プロジェクト|ワーク/.test(text))o.style='pro';
+  if(m=text.match(/(\d+)\s*単位/))o.target=clamp(+m[1],6,S.prof.limit);
+  const easy=/楽|ラク|らく|単位.*(確実|ほしい|欲しい|取りた)|負荷.*(低|軽)/.test(text),grow=/成長|スキル|力をつけ|ガチ|頑張|挑戦|強化/.test(text);
+  const base={e:50,g:50,f:40};if(easy&&!grow)Object.assign(base,{e:85,g:15});if(grow&&!easy)Object.assign(base,{e:15,g:85});
+  const mk=(title,desc,w)=>({title,desc,ids:buildPlan(Object.assign({},o,{w}))});
+  const plans=[mk('🌿 楽さ重視案','A+率が高く、F率・負荷が低い講義を中心に',{e:90,g:10,f:35}),mk('⚖️ バランス案','楽さ・成長・楽しさを均等に',{e:50,g:50,f:40}),mk('🚀 成長重視案','目的に直結するスキル系を中心に',{e:10,g:90,f:35})];
+  const cond=[];
+  if(o.free)cond.push(`週${o.free}日休み`);if(o.block.length)cond.push(o.block.map(d=>DAYS[d]+'曜').join('・')+'なし');
+  if(o.tags.length)cond.push('興味:'+[...new Set(o.tags)].join('・'));if(o.goal)cond.push('目的:'+GOAL[o.goal]);if(o.style)cond.push('形態:'+STYLE[o.style]);if(o.target)cond.push(o.target+'単位');
+  const reply=cond.length?`条件を読み取りました ✅\n${cond.join(' / ')}\nこの条件で3つの案を作りました。`:`具体的な条件が読み取れなかったので、プロフィールをもとに3案を作りました。曜日(例:金曜休み)や興味(例:AI、英語)を足すと精度が上がります。`;
+  return {reply,plans};
+}
+function render(){
+  const v=$('#view'),keep=v.scrollTop;
+  v.innerHTML={home:vHome,explore:vExplore,time:vTime,grad:vGrad,ai:vAI}[S.tab]();
+  renderTabs();renderMini();v.scrollTop=keep;
+  if(S.tab==='ai'&&S.chat.length&&S._scroll){v.scrollTop=v.scrollHeight;S._scroll=false}
+}
+function profileSheet(){
+  const p=S.prof;
+  openSheet(`<h3 style="margin:0 0 2px;font-size:24px">プロフィール</h3><p class="sub">入力に合わせて、すべてのスコアが変わります</p>
+  <label class="f">ニックネーム</label><input class="in" id="pn" value="${p.name}">
+  <label class="f">学部</label><div class="opts">${['APM','APS'].map(f=>`<button class="chip ${p.fac===f?'on':''}" data-a="pset" data-k="fac" data-v="${f}">${f==='APM'?'国際経営学部':'アジア太平洋学部'}</button>`).join('')}</div>
+  <label class="f">学年</label><div class="opts">${[1,2,3,4].map(y=>`<button class="chip ${p.year===y?'on':''}" data-a="pset" data-k="year" data-v="${y}">${y}年</button>`).join('')}</div>
+  <label class="f">目的</label><div class="opts">${Object.entries(GOAL).map(([k,v])=>`<button class="chip ${p.goal===k?'on':''}" data-a="pset" data-k="goal" data-v="${k}">${v}</button>`).join('')}</div>
+  <label class="f">性格タイプ</label><div class="opts">${Object.entries(PERS).map(([k,v])=>`<button class="chip ${p.pers===k?'on':''}" data-a="pset" data-k="pers" data-v="${k}">${v}</button>`).join('')}</div>
+  <label class="f">好きな授業形態(複数OK)</label><div class="opts">${Object.entries(STYLE).map(([k,v])=>`<button class="chip ${p.styles.includes(k)?'on':''}" data-a="pstyle" data-v="${k}">${v}</button>`).join('')}</div>
+  <label class="f">1学期の履修上限:${p.limit}単位</label><input type="range" min="12" max="28" step="2" value="${p.limit}" data-a="plimit">
+  <label class="f">友達の履修を表示(デモ)</label><div class="opts"><button class="chip ${p.friends?'on':''}" data-a="pset" data-k="friends" data-v="${!p.friends}">${ic('users')}${p.friends?'ON':'OFF'}</button></div>
+  <div class="act"><button class="btn g" data-a="reset">${ic('trash')} 初期化</button><button class="btn" data-a="psave">${ic('check')} 完了</button></div>`);
+}
+/* ============ イベント ============ */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-a]');
+  if(e.target.id==='ov'){closeSheet();return}
+  if(!t)return;
+  const a=t.dataset.a,id=+t.dataset.id;
+  switch(a){
+   case'tab':S.tab=t.dataset.t;closeSheet();save();render();$('#view').scrollTop=0;break;
+   case'detail':detail(id);break;
+   case'toggle':addCourse(id);renderSheetIfOpen(id);break;
+   case'mark':S.saved=S.saved.includes(id)?S.saved.filter(i=>i!==id):S.saved.concat(id);save();detail(id);break;
+   case'unlock':if(S.points<1){toast('ポイントが足りません。レビューを投稿しよう');break}S.points--;S.unlocked.push(id);save();detail(id);toast('レビューを解放しました(-1pt)');break;
+   case'review':reviewForm(id);break;
+   case'star':document.querySelectorAll('#stars .chip').forEach((b,i)=>b.classList.toggle('on',i+1===+t.dataset.n));break;
+   case'postrv':{let st=1;document.querySelectorAll('#stars .chip').forEach((b,i)=>{if(b.classList.contains('on'))st=i+1});
+     const tx=$('#rtext').value.trim()||'(コメントなし)';(S.reviews[id]=S.reviews[id]||[]).push([st,tx+(($('#grade').value!=='回答しない')?`(成績:${$('#grade').value})`:'')]);S.points+=3;S.unlocked.push(id);save();detail(id);toast('投稿ありがとう! +3pt');break}
+   case'chip':S.f.chip=t.dataset.c;render();break;
+   case'sort':S.f.sort=t.dataset.s;render();break;
+   case'clrslot':S.f.slot=null;render();break;
+   case'slot':S.f.slot=[+t.dataset.d,+t.dataset.p];S.f.chip='all';S.f.q='';S.tab='explore';render();$('#view').scrollTop=0;break;
+   case'seg':S.seg=t.dataset.s;render();break;
+   case'plan':S.cur=+t.dataset.i;save();render();break;
+   case'autoplan':S.plans[S.cur]=buildPlan({});save();S.tab='time';S.seg='grid';render();toast('✨ AIが最適な時間割を作りました');break;
+   case'gacha':S.plans[S.cur]=buildPlan({jitter:45,w:{e:50,g:50,f:60}});save();render();toast('🎲 新しい時間割ができました!');break;
+   case'clear':S.plans[S.cur]=[];save();render();break;
+   case'gen3':{S.plans[0]=buildPlan({w:{e:90,g:10,f:35}});S.plans[1]=buildPlan({});S.plans[2]=buildPlan({w:{e:10,g:90,f:35}});save();render();toast('A=楽さ / B=バランス / C=成長 で作成');break}
+   case'earn':{const k=t.dataset.k;S.prof.earned[k]=clamp(S.prof.earned[k]+ +t.dataset.d,0,REQ[k]);save();render();break}
+   case'ask':S.chat.push({r:'me',t:t.dataset.t});reply(t.dataset.t);break;
+   case'send':{const v=$('#ci').value.trim();if(!v)break;S.chat.push({r:'me',t:v});reply(v);break}
+   case'apply':{const pl=S.chat[+t.dataset.m].plans[+t.dataset.j];S.plans[S.cur]=pl.ids.slice();save();toast(`${'ABC'[S.cur]}案に適用しました`,'時間割を見る',()=>{S.tab='time';S.seg='grid';render()});render();break}
+   case'profile':profileSheet();break;
+   case'pset':{let v=t.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;else if(!isNaN(v))v=+v;S.prof[t.dataset.k]=v;profileSheet();break}
+   case'pstyle':{const s=S.prof.styles,v=t.dataset.v;S.prof.styles=s.includes(v)?s.filter(x=>x!==v):s.concat(v);profileSheet();break}
+   case'psave':S.prof.name=$('#pn').value.trim()||'あなた';S.prof.seen=true;save();closeSheet();render();toast('プロフィールを更新しました');break;
+   case'reset':if(confirm('保存データをすべて初期化します。よろしいですか?')){localStorage.removeItem(KEY);S=DEF();closeSheet();init()}break;
+  }
+});
+document.addEventListener('input',e=>{
+  if(e.target.id==='q'){S.f.q=e.target.value;const pos=e.target.selectionStart;render();const q=$('#q');q.focus();q.setSelectionRange(pos,pos)}
+  if(e.target.dataset.a==='mode'){S.prof.mode=+e.target.value;$('#modeTx').textContent=modeText(S.prof.mode);save()}
+  if(e.target.dataset.a==='plimit'){S.prof.limit=+e.target.value;e.target.previousElementSibling.textContent=`1学期の履修上限:${S.prof.limit}単位`}
+});
+document.addEventListener('change',e=>{if(e.target.dataset.a==='mode'){render()}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='ci'){const v=e.target.value.trim();if(v){S.chat.push({r:'me',t:v});reply(v)}}});
+function reply(text){
+  S._scroll=true;render();
+  const r=advise(text);
+  setTimeout(()=>{S.chat.push({r:'ai',t:r.reply});S.chat.push({plans:r.plans});S._scroll=true;save();render()},550);
+}
+function init(){
+  if(!plan().length&&!S.plans.some(p=>p.length)){S.plans[0]=buildPlan({});S.plans[1]=buildPlan({w:{e:90,g:10,f:35}});S.plans[2]=buildPlan({w:{e:10,g:90,f:35}})}
+  const h=location.hash.slice(1).split(':');
+  if(h[0]&&TABS.some(t=>t[0]===h[0])){S.tab=h[0];S.prof.seen=true;if(h[1]==='load'||h[1]==='cmp')S.seg=h[1]}
+  render();save();
+  if(h[0]==='ai'&&h[1]){const q=decodeURIComponent(h[1]);S.chat=[{r:'me',t:q}];const r=advise(q);S.chat.push({r:'ai',t:r.reply},{plans:r.plans});render()}
+  if(h[0]==='detail'){S.prof.seen=true;detail(+h[1])}
+  if(!S.prof.seen)setTimeout(profileSheet,350);
+}
+init();
+</script>
+</body>
+</html>
